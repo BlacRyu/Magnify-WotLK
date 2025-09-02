@@ -29,6 +29,25 @@ MagnifyOptions = {
     enableOldPartyIcons = false,
 }
 
+
+-- Hook in to mixin to detect when map changes
+-- WorldMapDataProvider = CreateFromMixins(MapCanvasDataProviderMixin)
+-- WorldMapDataProvider.Parent_OnMapChanged = WorldMapDataProvider.OnMapChanged
+-- WorldMapDataProvider.OnMapChanged = Magnify.OnMapChanged
+
+-- function Magnify.OnMapChanged()
+--     WorldMapDataProvider.Parent_OnMapChanged(WorldMapDataProvider)
+
+--     -- Reset zoom
+--     Magnify.SetDetailFrameScale(Magnify.MIN_ZOOM)
+
+--     WorldMapScrollFrame:SetHorizontalScroll(0)
+--     WorldMapScrollFrame:SetVerticalScroll(0)
+--     Magnify.AfterScrollOrPan()
+
+--     WorldMapScrollFrame.zoomedIn = false
+-- end
+
 local function updatePointRelativeTo(frame, newRelativeFrame)
     local currentPoint, _currentRelativeFrame, currentRelativePoint, currentOffsetX, currentOffsetY = frame:GetPoint()
     frame:ClearAllPoints()
@@ -573,14 +592,6 @@ function Magnify.WorldMapButton_OnMouseUp()
 
     if not WorldMapScrollFrame.moved then
         WorldMapButton_OnClick(WorldMapButton, arg1)
-
-        Magnify.SetDetailFrameScale(Magnify.MIN_ZOOM)
-
-        WorldMapScrollFrame:SetHorizontalScroll(0)
-        WorldMapScrollFrame:SetVerticalScroll(0)
-        Magnify.AfterScrollOrPan()
-
-        WorldMapScrollFrame.zoomedIn = false
     end
 
     WorldMapScrollFrame.moved = false
@@ -645,6 +656,17 @@ function Magnify.OnFirstLoad()
                 -15 - WorldMapQuestShowObjectivesText:GetWidth(), 4);
         end
     end);
+
+    -- Reset zoom when map changes
+    -- hooksecurefunc(WorldMapFrame, "OnMapChanged", function()
+    --     Magnify.SetDetailFrameScale(Magnify.MIN_ZOOM);
+
+    --     WorldMapScrollFrame:SetHorizontalScroll(0);
+    --     WorldMapScrollFrame:SetVerticalScroll(0);
+    --     Magnify.AfterScrollOrPan();
+
+    --     WorldMapScrollFrame.zoomedIn = false;
+    -- end);
 
     WorldMapScreenAnchor:StartMoving();
     WorldMapScreenAnchor:SetPoint("TOPLEFT", 10, -118);
